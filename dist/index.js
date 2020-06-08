@@ -415,7 +415,7 @@ async function main() {
   try {
     const text = core.getInput("url");
     const target = core.getInput("target");
-    const autoMatch = core.getInput("auto-match");
+    let autoMatch = core.getInput("auto-match");
     if (["false", "0"].includes(autoMatch.toLowerCase().trim())) {
       autoMatch = false;
     } else {
