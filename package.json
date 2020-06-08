@@ -3,5 +3,23 @@
     "@actions/core": "^1.2.4",
     "@actions/github": "^3.0.0",
     "node-fetch": "^2.6.0"
-  }
+  },
+  "devDependencies": {
+    "@zeit/ncc": "^0.22.3"
+  },
+  "name": "actions-download-file",
+  "scripts": {
+    "build": "ncc build"
+  },
+  "keywords": [
+    "github",
+    "actions"
+  ],
+  "version": "1.1.0",
+  "description": "An action used to filter out a URL and download files for further works.",
+  "main": "index.js",
+  "repository": "git@github.com:suisei-cn/actions-download-file.git",
+  "author": "Outvi V <git@outv.im>",
+  "license": "MIT",
+  "private": true
 }
