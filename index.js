@@ -14,13 +14,9 @@ function getFilenameFromUrl(url) {
 
 async function main() {
   try {
-    // const text = core.getInput("url");
-    var text =
-      "cc(https://suisei.outv.im/clips/output-oIfwhsO-0Pk-2529.8-2542.3.mp3)cc";
-    // const target = core.getInput("target");
-    var target = "src/kmm";
-    // const autoMatch = core.getInput("auto-match");
-    var autoMatch = "true";
+    const text = core.getInput("url");
+    const target = core.getInput("target");
+    const autoMatch = core.getInput("auto-match");
     if (["false", "0"].includes(autoMatch.toLowerCase().trim())) {
       autoMatch = false;
     } else {
