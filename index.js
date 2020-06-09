@@ -54,6 +54,7 @@ async function main() {
     const filename = getFilenameFromUrl(url);
     fs.writeFileSync(path.join(target, filename), body);
     console.log("File saved.");
+    core.setOutput("filename", filename);
   } catch (error) {
     core.setFailed(error.message);
   }
