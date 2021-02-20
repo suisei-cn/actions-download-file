@@ -3,18 +3,11 @@ An action used to filter out a URL and download files for further works.
 
 ## Usage
 
-To use this action, add it into your workflow file. You can directly give it an URL:
+### With `auto-match: true`
 
-``` yaml
-- uses: suisei-cn/actions-download-file@v1
-  id: downloadfile  # Remember to give an ID if you need the output
-  name: Download the file
-  with:
-    url: "https://cdn.jsdelivr.net/npm/workbox-sw@5.1.3/build/workbox-sw.min.js"
-    target: public/
-```
+With `auto-match: true` it searches for the first URL wrapped in `()` brackets.
 
-You can also let it pick the first `[]()` format URL from Markdown:
+For example, you can let it pick the first `[]()` format URL from Markdown:
 
 ``` yaml
 - uses: suisei-cn/actions-download-file@v1
@@ -26,7 +19,7 @@ You can also let it pick the first `[]()` format URL from Markdown:
     auto-match: true
 ```
 
-Finding the first `[]()` format URL from a comment event is also okay, which is the primary aim of this action:
+Finding the first `[]()` format URL from a comment event is also working, which is the primary aim of this action:
 
 ``` yaml
 - uses: suisei-cn/actions-download-file@v1
@@ -38,6 +31,31 @@ Finding the first `[]()` format URL from a comment event is also okay, which is 
     auto-match: true
 ```
 
+### Without `auto-match`
+
+With `auto-match: false` (which is the default behavior), you can directly give it an URL:
+
+``` yaml
+- uses: suisei-cn/actions-download-file@v1
+  id: downloadfile  # Remember to give an ID if you need the output filename
+  name: Download the file
+  with:
+    url: "https://cdn.jsdelivr.net/npm/workbox-sw@5.1.3/build/workbox-sw.min.js"
+    target: public/
+```
+
+Note that you can achieve the same goal on Linux/macOS with simply one command, if you don't need the output:
+
+``` yaml
+- name: Download a file
+  run: curl https://path/to/file -o path/to/save
+```
+
+``` yaml
+- name: Download a file
+  run: wget https://path/to/file -O path/to/save
+```
+
 ## `with`
 * url: The URL, or the Markdown text containing an URL
 * target: The target directory where the downloaded file lies. Will be automatically created if not exists.
@@ -47,7 +65,7 @@ Finding the first `[]()` format URL from a comment event is also okay, which is 
 * filename: The written file name.
 
 ## How `auto-match` works?
-It attempts to find the first URL with the format `(url)`, such as `(https://g.co)`, which is the common way to embed an `<a>` into Markdown.
+It attempts to find the first URL with the format `(url)`, such as `(https://g.co)`, which is the common way to embed a link into Markdown.
 
 ## Will it fail?
 This action WILL fail if it cannot finish its job, including but not limited to the cases when:
