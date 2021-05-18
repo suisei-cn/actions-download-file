@@ -75,7 +75,7 @@ This action WILL fail if it cannot finish its job, including but not limited to 
 * It cannot find an URL with the format `(url)`
 
 ## Examples
-* <https://github.com/suisei-cn/starbuttons/blob/master/.github/workflows/auto_pr.yml>
+* <https://github.com/suisei-cn/sbtn-assets/blob/master/.github/workflows/auto_pr.yml>
 
 ## License
 MIT
