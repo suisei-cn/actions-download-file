@@ -16,6 +16,7 @@ async function main() {
   try {
     const text = core.getInput("url");
     const target = core.getInput("target");
+    const filename = core.getInput("filename");
     let autoMatch = core.getInput("auto-match");
     if (["false", "0"].includes(autoMatch.toLowerCase().trim())) {
       autoMatch = false;
@@ -51,10 +52,19 @@ async function main() {
       });
     if (body === undefined) return;
     console.log("Download completed.");
-    const filename = getFilenameFromUrl(url);
-    fs.writeFileSync(path.join(target, filename), body);
+    let finalFilename = "";
+    if (filename) {
+      finalFilename = String(filename);
+    } else {
+      finalFilename = getFilenameFromUrl(url);
+    }
+    if (finalFilename === "") {
+      core.setFailed("Filename not found. Please indicate it in the URL or set `filename` in the workflow.");
+      return;
+    }
+    fs.writeFileSync(path.join(target, finalFilename), body);
     console.log("File saved.");
-    core.setOutput("filename", filename);
+    core.setOutput("filename", finalFilename);
   } catch (error) {
     core.setFailed(error.message);
   }
