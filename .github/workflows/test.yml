@@ -1,0 +1,23 @@
+name: "Testing"
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  test_the_action:
+    name: Test the action
+    runs-on: ubuntu-18.04
+    steps:
+      - uses: actions/checkout@v2          
+      - uses: suisei-cn/actions-download-file@master
+        id: downloadfile
+        name: Download a file
+        with:
+          url: "[API Endpoint](https://api.github.com/repos/suisei-cn/actions-download-file)"
+          target: public/
+          auto-match: true
+
+      - name: Display the file
+        run: head -n8 public/actions-download-file          
