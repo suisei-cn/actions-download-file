@@ -1,5 +1,4 @@
 const core = require("@actions/core");
-const github = require("@actions/github");
 const fs = require("fs");
 const path = require("path");
 const fetch = require("node-fetch");
