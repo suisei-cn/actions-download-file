@@ -1,7 +1,7 @@
 {
   "dependencies": {
     "@actions/core": "^1.6.0",
-    "node-fetch": "^3.2.0"
+    "node-fetch": "^2"
   },
   "devDependencies": {
     "@vercel/ncc": "^0.33.1"
