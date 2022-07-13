@@ -6,11 +6,14 @@ on:
       - master
 
 jobs:
-  test_the_action:
-    name: Test the action
-    runs-on: ubuntu-18.04
+  test_simple:
+    strategy:
+      matrix:
+        os: [ubuntu-18.04, ubuntu-20.04, ubuntu-22.04]
+    name: "Test: Simple"
+    runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v2          
+      - uses: actions/checkout@v2
       - uses: suisei-cn/actions-download-file@master
         id: downloadfile
         name: Download a file
@@ -20,4 +23,24 @@ jobs:
           auto-match: true
 
       - name: Display the file
-        run: head -n8 public/actions-download-file          
+        run: head -n8 public/actions-download-file
+
+  test_filename:
+    strategy:
+      matrix:
+        os: [ubuntu-18.04, ubuntu-20.04, ubuntu-22.04]
+    name: "Test: With the filename"
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: suisei-cn/actions-download-file@master
+        id: downloadfile
+        name: Download a file
+        with:
+          url: "[API Endpoint](https://api.github.com/repos/suisei-cn/actions-download-file)"
+          target: public/
+          auto-match: true
+          filename: api-result.json
+
+      - name: Display the file
+        run: head -n8 public/api-result.json
