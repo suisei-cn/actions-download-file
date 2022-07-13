@@ -13,6 +13,10 @@ inputs:
     description: 'Match the first URL from "url"'
     required: false
     default: "false"
+  filename:
+    description: "Filename for the downloaded file"
+    required: false
+    default: ""
 outputs:
   filename:
     description: "Written file name"
