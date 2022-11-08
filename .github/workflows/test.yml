@@ -1,9 +1,7 @@
 name: "Testing"
 
 on:
-  push:
-    branches:
-      - master
+  push: {}
 
 jobs:
   test_simple:
