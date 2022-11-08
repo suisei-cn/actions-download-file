@@ -58,8 +58,6 @@ jobs:
           url: "[API Endpoint](https://api.github.com/repos/suisei-cn/actions-download-file)"
           target: public/
           auto-match: true
+
       - name: Check output filename
         run: "[ 'actions-download-file' = '${{ steps.downloadfile.outputs.filename }}' ] && echo 'OK' || exit 1"
-
-      - name: Display the file
-        run: head -n8 public/api-result.json
