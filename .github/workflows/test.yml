@@ -11,7 +11,7 @@ jobs:
     name: "Test: Simple"
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: suisei-cn/actions-download-file@master
         id: downloadfile
         name: Download a file
@@ -30,7 +30,7 @@ jobs:
     name: "Test: With the filename"
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: suisei-cn/actions-download-file@master
         id: downloadfile
         name: Download a file
