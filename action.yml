@@ -17,6 +17,10 @@ inputs:
     description: "Filename for the downloaded file"
     required: false
     default: ""
+  retry-times:
+    description: "Times to retry on download failure"
+    required: false
+    default: "0"
 outputs:
   filename:
     description: "Written file name"

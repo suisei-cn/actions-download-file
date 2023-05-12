@@ -524,8 +524,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.OidcClient = void 0;
-const http_client_1 = __nccwpck_require__(9706);
-const auth_1 = __nccwpck_require__(8336);
+const http_client_1 = __nccwpck_require__(199);
+const auth_1 = __nccwpck_require__(6259);
 const core_1 = __nccwpck_require__(7954);
 class OidcClient {
     static createHttpClient(allowRetry = true, maxRetry = 10) {
@@ -994,7 +994,7 @@ exports.toCommandProperties = toCommandProperties;
 
 /***/ }),
 
-/***/ 8336:
+/***/ 6259:
 /***/ (function(__unused_webpack_module, exports) {
 
 "use strict";
@@ -1082,7 +1082,7 @@ exports.PersonalAccessTokenCredentialHandler = PersonalAccessTokenCredentialHand
 
 /***/ }),
 
-/***/ 9706:
+/***/ 199:
 /***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
@@ -1120,7 +1120,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.HttpClient = exports.isHttps = exports.HttpClientResponse = exports.HttpClientError = exports.getProxyUrl = exports.MediaTypes = exports.Headers = exports.HttpCodes = void 0;
 const http = __importStar(__nccwpck_require__(3685));
 const https = __importStar(__nccwpck_require__(5687));
-const pm = __importStar(__nccwpck_require__(531));
+const pm = __importStar(__nccwpck_require__(7153));
 const tunnel = __importStar(__nccwpck_require__(8125));
 var HttpCodes;
 (function (HttpCodes) {
@@ -1694,7 +1694,7 @@ const lowercaseKeys = (obj) => Object.keys(obj).reduce((c, k) => ((c[k.toLowerCa
 
 /***/ }),
 
-/***/ 531:
+/***/ 7153:
 /***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
@@ -1726,6 +1726,10 @@ function checkBypass(reqUrl) {
     if (!reqUrl.hostname) {
         return false;
     }
+    const reqHost = reqUrl.hostname;
+    if (isLoopbackAddress(reqHost)) {
+        return true;
+    }
     const noProxy = process.env['no_proxy'] || process.env['NO_PROXY'] || '';
     if (!noProxy) {
         return false;
@@ -1751,18 +1755,29 @@ function checkBypass(reqUrl) {
         .split(',')
         .map(x => x.trim().toUpperCase())
         .filter(x => x)) {
-        if (upperReqHosts.some(x => x === upperNoProxyItem)) {
+        if (upperNoProxyItem === '*' ||
+            upperReqHosts.some(x => x === upperNoProxyItem ||
+                x.endsWith(`.${upperNoProxyItem}`) ||
+                (upperNoProxyItem.startsWith('.') &&
+                    x.endsWith(`${upperNoProxyItem}`)))) {
             return true;
         }
     }
     return false;
 }
 exports.checkBypass = checkBypass;
+function isLoopbackAddress(host) {
+    const hostLower = host.toLowerCase();
+    return (hostLower === 'localhost' ||
+        hostLower.startsWith('127.') ||
+        hostLower.startsWith('[::1]') ||
+        hostLower.startsWith('[0:0:0:0:0:0:0:1]'));
+}
 //# sourceMappingURL=proxy.js.map
 
 /***/ }),
 
-/***/ 9608:
+/***/ 5048:
 /***/ ((module, exports, __nccwpck_require__) => {
 
 "use strict";
@@ -3186,6 +3201,20 @@ const isDomainOrSubdomain = function isDomainOrSubdomain(destination, original) 
 };
 
 /**
+ * isSameProtocol reports whether the two provided URLs use the same protocol.
+ *
+ * Both domains must already be in canonical form.
+ * @param {string|URL} original
+ * @param {string|URL} destination
+ */
+const isSameProtocol = function isSameProtocol(destination, original) {
+	const orig = new URL$1(original).protocol;
+	const dest = new URL$1(destination).protocol;
+
+	return orig === dest;
+};
+
+/**
  * Fetch function
  *
  * @param   Mixed    url   Absolute url or Request instance
@@ -3216,7 +3245,7 @@ function fetch(url, opts) {
 			let error = new AbortError('The user aborted a request.');
 			reject(error);
 			if (request.body && request.body instanceof Stream.Readable) {
-				request.body.destroy(error);
+				destroyStream(request.body, error);
 			}
 			if (!response || !response.body) return;
 			response.body.emit('error', error);
@@ -3257,8 +3286,42 @@ function fetch(url, opts) {
 
 		req.on('error', function (err) {
 			reject(new FetchError(`request to ${request.url} failed, reason: ${err.message}`, 'system', err));
+
+			if (response && response.body) {
+				destroyStream(response.body, err);
+			}
+
 			finalize();
 		});
+
+		fixResponseChunkedTransferBadEnding(req, function (err) {
+			if (signal && signal.aborted) {
+				return;
+			}
+
+			if (response && response.body) {
+				destroyStream(response.body, err);
+			}
+		});
+
+		/* c8 ignore next 18 */
+		if (parseInt(process.version.substring(1)) < 14) {
+			// Before Node.js 14, pipeline() does not fully support async iterators and does not always
+			// properly handle when the socket close/end events are out of order.
+			req.on('socket', function (s) {
+				s.addListener('close', function (hadError) {
+					// if a data listener is still present we didn't end cleanly
+					const hasDataListener = s.listenerCount('data') > 0;
+
+					// if end happened before close but the socket didn't emit an error, do it now
+					if (response && hasDataListener && !hadError && !(signal && signal.aborted)) {
+						const err = new Error('Premature close');
+						err.code = 'ERR_STREAM_PREMATURE_CLOSE';
+						response.body.emit('error', err);
+					}
+				});
+			});
+		}
 
 		req.on('response', function (res) {
 			clearTimeout(reqTimeout);
@@ -3331,7 +3394,7 @@ function fetch(url, opts) {
 							size: request.size
 						};
 
-						if (!isDomainOrSubdomain(request.url, locationURL)) {
+						if (!isDomainOrSubdomain(request.url, locationURL) || !isSameProtocol(request.url, locationURL)) {
 							for (const name of ['authorization', 'www-authenticate', 'cookie', 'cookie2']) {
 								requestOpts.headers.delete(name);
 							}
@@ -3424,6 +3487,13 @@ function fetch(url, opts) {
 					response = new Response(body, response_options);
 					resolve(response);
 				});
+				raw.on('end', function () {
+					// some old IIS servers return zero-length OK deflate responses, so 'data' is never emitted.
+					if (!response) {
+						response = new Response(body, response_options);
+						resolve(response);
+					}
+				});
 				return;
 			}
 
@@ -3443,6 +3513,41 @@ function fetch(url, opts) {
 		writeToStream(req, request);
 	});
 }
+function fixResponseChunkedTransferBadEnding(request, errorCallback) {
+	let socket;
+
+	request.on('socket', function (s) {
+		socket = s;
+	});
+
+	request.on('response', function (response) {
+		const headers = response.headers;
+
+		if (headers['transfer-encoding'] === 'chunked' && !headers['content-length']) {
+			response.once('close', function (hadError) {
+				// if a data listener is still present we didn't end cleanly
+				const hasDataListener = socket.listenerCount('data') > 0;
+
+				if (hasDataListener && !hadError) {
+					const err = new Error('Premature close');
+					err.code = 'ERR_STREAM_PREMATURE_CLOSE';
+					errorCallback(err);
+				}
+			});
+		}
+	});
+}
+
+function destroyStream(stream, err) {
+	if (stream.destroy) {
+		stream.destroy(err);
+	} else {
+		// node < 8
+		stream.emit('error', err);
+		stream.end();
+	}
+}
+
 /**
  * Redirect code matching
  *
@@ -6735,7 +6840,7 @@ var __webpack_exports__ = {};
 const core = __nccwpck_require__(7954);
 const fs = __nccwpck_require__(7147);
 const path = __nccwpck_require__(1017);
-const fetch = __nccwpck_require__(9608);
+const fetch = __nccwpck_require__(5048);
 
 function getFilenameFromUrl(url) {
   const u = new URL(url);
@@ -6743,6 +6848,27 @@ function getFilenameFromUrl(url) {
   const pathClips = pathname.split("/");
   const filenameWithArgs = pathClips[pathClips.length - 1];
   return filenameWithArgs.replace(/\?.*/, "");
+}
+
+const FetchFailure = Symbol("FetchFailure");
+
+async function tryFetch(url, retryTimes) {
+  let result;
+  for (let i = 1; i <= retryTimes; i++) {
+    result = await fetch(url)
+      .then((x) => x.buffer())
+      .catch((err) => {
+        console.error(
+          `[${i}/${retryTimes}] Fail to download file ${url}: ${err}`
+        );
+        if (i === retryTimes) {
+          core.setFailed(`Fail to download file ${url}: ${err}`);
+        }
+        return FetchFailure;
+      });
+    if (result !== FetchFailure) return result;
+  }
+  return FetchFailure;
 }
 
 async function main() {
@@ -6755,6 +6881,12 @@ async function main() {
       autoMatch = false;
     } else {
       autoMatch = true;
+    }
+    const retryTimesValue = core.getInput("retry-times");
+    const retryTimes = Number(retryTimesValue);
+    if (Number.isNaN(retryTimes)) {
+      core.setFailed(`Invalid value for "retry-times": ${retryTimesValue}`);
+      return;
     }
     const url = (() => {
       if (!autoMatch) return text;
@@ -6777,13 +6909,8 @@ async function main() {
       core.setFailed(`Failed to create target directory ${target}: ${e}`);
       return;
     }
-    const body = await fetch(url)
-      .then((x) => x.buffer())
-      .catch((err) => {
-        core.setFailed(`Fail to download file ${url}: ${err}`);
-        return undefined;
-      });
-    if (body === undefined) return;
+    const body = await tryFetch(url, retryTimes);
+    if (body === FetchFailure) return;
     console.log("Download completed.");
     let finalFilename = "";
     if (filename) {
@@ -6792,7 +6919,9 @@ async function main() {
       finalFilename = getFilenameFromUrl(url);
     }
     if (finalFilename === "") {
-      core.setFailed("Filename not found. Please indicate it in the URL or set `filename` in the workflow.");
+      core.setFailed(
+        "Filename not found. Please indicate it in the URL or set `filename` in the workflow."
+      );
       return;
     }
     fs.writeFileSync(path.join(target, finalFilename), body);

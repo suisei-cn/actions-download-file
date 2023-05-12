@@ -61,6 +61,7 @@ Note that you can achieve the same goal on Linux/macOS with simply one command, 
 * target: The target directory where the downloaded file lies. Will be automatically created if not exists.
 * auto-match: (optional, default `false`) If we find the URL from the text, or use the `url` parameter directly as the URL.
 * filename: (optional) The filename to use when saving. If not given, use the original filename from the URL.
+* retry-times: (optional, default `0`) Times to retry on download failure. If not given, don't attempt to retry.
 
 ## Output
 * filename: The written file name.

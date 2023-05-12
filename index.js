@@ -11,6 +11,27 @@ function getFilenameFromUrl(url) {
   return filenameWithArgs.replace(/\?.*/, "");
 }
 
+const FetchFailure = Symbol("FetchFailure");
+
+async function tryFetch(url, retryTimes) {
+  let result;
+  for (let i = 1; i <= retryTimes; i++) {
+    result = await fetch(url)
+      .then((x) => x.buffer())
+      .catch((err) => {
+        console.error(
+          `[${i}/${retryTimes}] Fail to download file ${url}: ${err}`
+        );
+        if (i === retryTimes) {
+          core.setFailed(`Fail to download file ${url}: ${err}`);
+        }
+        return FetchFailure;
+      });
+    if (result !== FetchFailure) return result;
+  }
+  return FetchFailure;
+}
+
 async function main() {
   try {
     const text = core.getInput("url");
@@ -21,6 +42,12 @@ async function main() {
       autoMatch = false;
     } else {
       autoMatch = true;
+    }
+    const retryTimesValue = core.getInput("retry-times");
+    const retryTimes = Number(retryTimesValue);
+    if (Number.isNaN(retryTimes)) {
+      core.setFailed(`Invalid value for "retry-times": ${retryTimesValue}`);
+      return;
     }
     const url = (() => {
       if (!autoMatch) return text;
@@ -43,13 +70,8 @@ async function main() {
       core.setFailed(`Failed to create target directory ${target}: ${e}`);
       return;
     }
-    const body = await fetch(url)
-      .then((x) => x.buffer())
-      .catch((err) => {
-        core.setFailed(`Fail to download file ${url}: ${err}`);
-        return undefined;
-      });
-    if (body === undefined) return;
+    const body = await tryFetch(url, retryTimes);
+    if (body === FetchFailure) return;
     console.log("Download completed.");
     let finalFilename = "";
     if (filename) {
