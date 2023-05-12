@@ -56,10 +56,11 @@ Note that you can achieve the same goal on Linux/macOS with simply one command, 
   run: wget https://path/to/file -O path/to/save
 ```
 
-## `with`
+## Input parameters
 * url: The URL, or the Markdown text containing an URL
 * target: The target directory where the downloaded file lies. Will be automatically created if not exists.
 * auto-match: (optional, default `false`) If we find the URL from the text, or use the `url` parameter directly as the URL.
+* filename: (optional) The filename to use when saving. If not given, use the original filename from the URL.
 
 ## Output
 * filename: The written file name.
