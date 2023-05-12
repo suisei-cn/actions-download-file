@@ -16,7 +16,7 @@
     "github",
     "actions"
   ],
-  "version": "1.3.0",
+  "version": "1.4.0",
   "description": "An action used to filter out a URL and download files for further works.",
   "main": "index.js",
   "repository": "git@github.com:suisei-cn/actions-download-file.git",
