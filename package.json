@@ -4,11 +4,13 @@
     "node-fetch": "^2.6.11"
   },
   "devDependencies": {
-    "@vercel/ncc": "^0.34.0"
+    "@vercel/ncc": "^0.34.0",
+    "prettier": "^2.8.8"
   },
   "name": "actions-download-file",
   "scripts": {
-    "build": "ncc build"
+    "build": "ncc build",
+    "format": "prettier --write ./index.js"
   },
   "keywords": [
     "github",

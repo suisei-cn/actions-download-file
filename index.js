@@ -58,7 +58,9 @@ async function main() {
       finalFilename = getFilenameFromUrl(url);
     }
     if (finalFilename === "") {
-      core.setFailed("Filename not found. Please indicate it in the URL or set `filename` in the workflow.");
+      core.setFailed(
+        "Filename not found. Please indicate it in the URL or set `filename` in the workflow."
+      );
       return;
     }
     fs.writeFileSync(path.join(target, finalFilename), body);
