@@ -6854,12 +6854,14 @@ const FetchFailure = Symbol("FetchFailure");
 
 async function tryFetch(url, retryTimes) {
   let result;
-  for (let i = 1; i <= retryTimes; i++) {
+  for (let i = 0; i <= retryTimes; i++) {
     result = await fetch(url)
       .then((x) => x.buffer())
       .catch((err) => {
         console.error(
-          `[${i}/${retryTimes}] Fail to download file ${url}: ${err}`
+          `${
+            i === 0 ? "" : `[Retry ${i}/${retryTimes}]`
+          }Fail to download file ${url}: ${err}`
         );
         if (i === retryTimes) {
           core.setFailed(`Fail to download file ${url}: ${err}`);
