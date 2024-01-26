@@ -7,7 +7,14 @@ jobs:
   test_simple:
     strategy:
       matrix:
-        os: [ubuntu-20.04, ubuntu-22.04]
+        os:
+          - ubuntu-20.04
+          - ubuntu-22.04
+          - macos-13
+          - macos-12
+          - macos-11
+          - window-2022
+          - windows-2019
     name: "Test: Simple"
     runs-on: ${{ matrix.os }}
     steps:
@@ -26,7 +33,14 @@ jobs:
   test_filename:
     strategy:
       matrix:
-        os: [ubuntu-20.04, ubuntu-22.04]
+        os:
+          - ubuntu-20.04
+          - ubuntu-22.04
+          - macos-13
+          - macos-12
+          - macos-11
+          - window-2022
+          - windows-2019
     name: "Test: With the filename"
     runs-on: ${{ matrix.os }}
     steps:
@@ -46,7 +60,14 @@ jobs:
   test_output_filename:
     strategy:
       matrix:
-        os: [ubuntu-20.04, ubuntu-22.04]
+        os:
+          - ubuntu-20.04
+          - ubuntu-22.04
+          - macos-13
+          - macos-12
+          - macos-11
+          - window-2022
+          - windows-2019
     name: "Test: Check the output filename"
     runs-on: ${{ matrix.os }}
     steps:
