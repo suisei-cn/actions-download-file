@@ -2759,6 +2759,30 @@ module.exports = require("net");
 
 /***/ }),
 
+/***/ 254:
+/***/ ((module) => {
+
+"use strict";
+module.exports = require("node:buffer");
+
+/***/ }),
+
+/***/ 561:
+/***/ ((module) => {
+
+"use strict";
+module.exports = require("node:fs");
+
+/***/ }),
+
+/***/ 411:
+/***/ ((module) => {
+
+"use strict";
+module.exports = require("node:path");
+
+/***/ }),
+
 /***/ 37:
 /***/ ((module) => {
 
@@ -2833,8 +2857,9 @@ var __webpack_exports__ = {};
 // This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
 (() => {
 const core = __nccwpck_require__(954);
-const fs = __nccwpck_require__(147);
-const path = __nccwpck_require__(17);
+const fs = __nccwpck_require__(561);
+const path = __nccwpck_require__(411);
+const { Buffer } = __nccwpck_require__(254);
 
 function getFilenameFromUrl(url) {
   const u = new URL(url);
@@ -2851,6 +2876,7 @@ async function tryFetch(url, retryTimes) {
   for (let i = 0; i <= retryTimes; i++) {
     result = await fetch(url)
       .then((x) => x.arrayBuffer())
+      .then((x) => Buffer.from(x))
       .catch((err) => {
         console.error(
           `${
