@@ -1,7 +1,7 @@
 const core = require("@actions/core");
-const fs = require("fs");
-const path = require("path");
-const { Buffer } = require("buffer");
+const fs = require("node:fs");
+const path = require("node:path");
+const { Buffer } = require("node:buffer");
 
 function getFilenameFromUrl(url) {
   const u = new URL(url);
