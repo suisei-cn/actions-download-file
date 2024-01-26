@@ -13,7 +13,7 @@ jobs:
           - macos-13
           - macos-12
           - macos-11
-          - window-2022
+          - windows-2022
           - windows-2019
     name: "Test: Simple"
     runs-on: ${{ matrix.os }}
@@ -28,6 +28,7 @@ jobs:
           auto-match: true
 
       - name: Display the file
+        shell: bash
         run: head -n8 public/actions-download-file
 
   test_filename:
@@ -39,7 +40,7 @@ jobs:
           - macos-13
           - macos-12
           - macos-11
-          - window-2022
+          - windows-2022
           - windows-2019
     name: "Test: With the filename"
     runs-on: ${{ matrix.os }}
@@ -55,6 +56,7 @@ jobs:
           filename: api-result.json
 
       - name: Display the file
+        shell: bash
         run: head -n8 public/api-result.json
 
   test_output_filename:
@@ -66,7 +68,7 @@ jobs:
           - macos-13
           - macos-12
           - macos-11
-          - window-2022
+          - windows-2022
           - windows-2019
     name: "Test: Check the output filename"
     runs-on: ${{ matrix.os }}
@@ -80,5 +82,6 @@ jobs:
           target: public/
           auto-match: true
 
-      - name: Check output filename
+      - name: Check output filename (Linux/macOS)
+        shell: bash
         run: "[ 'actions-download-file' = '${{ steps.downloadfile.outputs.filename }}' ] && echo 'OK' || exit 1"
