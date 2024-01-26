@@ -1,6 +1,7 @@
 const core = require("@actions/core");
 const fs = require("fs");
 const path = require("path");
+const { Buffer } = require("buffer");
 
 function getFilenameFromUrl(url) {
   const u = new URL(url);
@@ -17,6 +18,7 @@ async function tryFetch(url, retryTimes) {
   for (let i = 0; i <= retryTimes; i++) {
     result = await fetch(url)
       .then((x) => x.arrayBuffer())
+      .then((x) => Buffer.from(x))
       .catch((err) => {
         console.error(
           `${
