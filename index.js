@@ -16,7 +16,7 @@ async function tryFetch(url, retryTimes) {
   let result;
   for (let i = 0; i <= retryTimes; i++) {
     result = await fetch(url)
-      .then((x) => x.buffer())
+      .then((x) => x.arrayBuffer())
       .catch((err) => {
         console.error(
           `${
