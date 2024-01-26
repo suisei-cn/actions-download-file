@@ -10,7 +10,7 @@ With `auto-match: true` it searches for the first URL wrapped in `()` brackets.
 For example, you can let it pick the first `[]()` format URL from Markdown:
 
 ``` yaml
-- uses: suisei-cn/actions-download-file@v1.4.0
+- uses: suisei-cn/actions-download-file@v1.5.0
   id: downloadfile  # Remember to give an ID if you need the output
   name: Download the file
   with:
@@ -23,7 +23,7 @@ For example, you can let it pick the first `[]()` format URL from Markdown:
 Finding the first `[]()` format URL from a comment event is also working, which is the primary aim of this action:
 
 ``` yaml
-- uses: suisei-cn/actions-download-file@v1.4.0
+- uses: suisei-cn/actions-download-file@v1.5.0
   id: downloadfile  # Remember to give an ID if you need the output
   name: Download the file
   with:
