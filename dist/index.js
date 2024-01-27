@@ -2759,14 +2759,6 @@ module.exports = require("net");
 
 /***/ }),
 
-/***/ 254:
-/***/ ((module) => {
-
-"use strict";
-module.exports = require("node:buffer");
-
-/***/ }),
-
 /***/ 561:
 /***/ ((module) => {
 
@@ -2859,7 +2851,6 @@ var __webpack_exports__ = {};
 const core = __nccwpck_require__(954);
 const fs = __nccwpck_require__(561);
 const path = __nccwpck_require__(411);
-const { Buffer } = __nccwpck_require__(254);
 
 function getFilenameFromUrl(url) {
   const u = new URL(url);
@@ -2876,11 +2867,10 @@ async function tryFetch(url, retryTimes) {
   for (let i = 0; i <= retryTimes; i++) {
     result = await fetch(url)
       .then((x) => x.arrayBuffer())
-      .then((x) => Buffer.from(x))
+      .then((x) => new Uint8Array(x))
       .catch((err) => {
         console.error(
-          `${
-            i === 0 ? "" : `[Retry ${i}/${retryTimes}]`
+          `${i === 0 ? "" : `[Retry ${i}/${retryTimes}]`
           }Fail to download file ${url}: ${err}`
         );
         if (i === retryTimes) {
@@ -2912,17 +2902,25 @@ async function main() {
     }
     const url = (() => {
       if (!autoMatch) return text;
-      if (autoMatch) {
-        const match = text.match(/\((.*)\)/);
-        if (match === null) return "";
-        return match[1] || "";
-      }
+      // if (autoMatch) {
+      const match = text.match(/\((.*)\)/);
+      if (match === null) return "";
+      return match[1] || "";
+      // }
     })();
     if (url.trim() === "") {
       core.setFailed("Failed to find a URL.");
       return;
     }
     console.log(`URL found: ${url}`);
+    let finalFilename = filename ? String(filename) : getFilenameFromUrl(url);
+    if (finalFilename === "") {
+      core.setFailed(
+        "Filename not found. Please indicate it in the URL or set `filename` in the workflow."
+      );
+      return;
+    }
+
     try {
       fs.mkdirSync(target, {
         recursive: true,
@@ -2934,18 +2932,7 @@ async function main() {
     const body = await tryFetch(url, retryTimes);
     if (body === FetchFailure) return;
     console.log("Download completed.");
-    let finalFilename = "";
-    if (filename) {
-      finalFilename = String(filename);
-    } else {
-      finalFilename = getFilenameFromUrl(url);
-    }
-    if (finalFilename === "") {
-      core.setFailed(
-        "Filename not found. Please indicate it in the URL or set `filename` in the workflow."
-      );
-      return;
-    }
+
     fs.writeFileSync(path.join(target, finalFilename), body);
     console.log("File saved.");
     core.setOutput("filename", finalFilename);
