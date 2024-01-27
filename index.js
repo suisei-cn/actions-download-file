@@ -12,10 +12,17 @@ function getFilenameFromUrl(url) {
 
 const FetchFailure = Symbol("FetchFailure");
 
-async function tryFetch(url, retryTimes) {
+async function tryFetch(url, retryTimes, failOnNon200) {
   let result;
   for (let i = 0; i <= retryTimes; i++) {
     result = await fetch(url)
+      .then((res) => {
+        if (failOnNon200 && !res.ok) {
+          // This will be catched and returns "FetchFailure"
+          throw new Error(`HTTP ${res.status} ${res.statusText}`);
+        }
+        return res.arrayBuffer();
+      })
       .then((x) => x.arrayBuffer())
       .then((x) => new Uint8Array(x))
       .catch((err) => {
@@ -44,6 +51,15 @@ async function main() {
     } else {
       autoMatch = true;
     }
+
+    let failOnNon200 = core.getInput("fail-on-non-200").toLowerCase().trim();
+    // only when failOnNon200 specified as "true" or "1" will fetch fail on non-200
+    if (["true", "1"].includes(failOnNon200)) {
+      failOnNon200 = true;
+    } else {
+      failOnNon200 = false;
+    }
+
     const retryTimesValue = core.getInput("retry-times");
     const retryTimes = Number(retryTimesValue);
     if (Number.isNaN(retryTimes)) {
