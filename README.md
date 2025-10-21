@@ -10,7 +10,7 @@ With `auto-match: true` it searches for the first URL wrapped in `()` brackets.
 For example, you can let it pick the first `[]()` format URL from Markdown:
 
 ``` yaml
-- uses: suisei-cn/actions-download-file@818d6b7dc8fe73f2f924b6241f2b1134ca1377d9 # 1.6.0
+- uses: suisei-cn/actions-download-file@9f75b8c2dad5ccced7509c44a3b881c5613abde2 # 1.6.1
   id: downloadfile  # Remember to give an ID if you need the output
   name: Download the file
   with:
@@ -23,7 +23,7 @@ For example, you can let it pick the first `[]()` format URL from Markdown:
 Finding the first `[]()` format URL from a comment event is also working, which is the primary aim of this action:
 
 ``` yaml
-- uses: suisei-cn/actions-download-file@818d6b7dc8fe73f2f924b6241f2b1134ca1377d9 # 1.6.0
+- uses: suisei-cn/actions-download-file@9f75b8c2dad5ccced7509c44a3b881c5613abde2 # 1.6.1
   id: downloadfile  # Remember to give an ID if you need the output
   name: Download the file
   with:
@@ -37,7 +37,7 @@ Finding the first `[]()` format URL from a comment event is also working, which 
 With `auto-match: false` (which is the default behavior), you can directly give it an URL:
 
 ``` yaml
-- uses: suisei-cn/actions-download-file@818d6b7dc8fe73f2f924b6241f2b1134ca1377d9 # 1.6.0
+- uses: suisei-cn/actions-download-file@9f75b8c2dad5ccced7509c44a3b881c5613abde2 # 1.6.1
   id: downloadfile  # Remember to give an ID if you need the output filename
   name: Download the file
   with:
@@ -81,7 +81,7 @@ This action WILL fail if it cannot finish its job, including but not limited to 
 * <https://github.com/suisei-cn/sbtn-assets/blob/master/.github/workflows/auto_pr.yml>
 
 ## Pinning the action by commit hash
-As git tags can be overwritten, we advise action users to pin to the exact action version by using the commit hash (e.g. `818d6b7dc8fe73f2f924b6241f2b1134ca1377d9`) instead of tag name (`v1.6.0`).
+As git tags can be overwritten, we advise action users to pin to the exact action version by using the commit hash (e.g. `9f75b8c2dad5ccced7509c44a3b881c5613abde2`) instead of tag name (`v1.6.1`).
 
 Read more on GitHub docs: [Security hardening for GitHub Actions](https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions#using-third-party-actions)
 
